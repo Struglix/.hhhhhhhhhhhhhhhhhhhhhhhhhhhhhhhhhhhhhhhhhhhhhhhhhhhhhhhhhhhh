@@ -1,0 +1,1389 @@
+local Geeow92JeIw815Neys752Mehska917 = {
+	VOw91ane91Lwdi926Mevs85aneToken = "Struglix_=[985?007axVn06_dFb]==Gh={}?.ttxo09",
+	SCRIPT_URL = "https://gist.githubusercontent.com/Struglix/ad9af3805cb202dd8b8a9136980b8946/raw/a84cfcf7351be11d3d64186d6188764af5f22e9b/gistfile1.txt",
+	DISCORD_INVITE = "https://discord.gg/nF8tFuVz8",
+	STORAGE_KEY = "StruglixVerifyToken",
+}
+
+local ASSETS = {
+	key = "rbxassetid://96510194465420",
+	check = "rbxassetid://76078495178149",
+	copy = "rbxassetid://125851897718493",
+	discord = "rbxassetid://83278450537116",
+	alert = "rbxassetid://140438367956051",
+	lock = "rbxassetid://114355063515473",
+	loading = "rbxassetid://116535712789945",
+	close = "rbxassetid://6022668916",
+	changelog = "rbxassetid://138133190015277",
+	logo = "https://raw.githubusercontent.com/Struglix/RawsShare/refs/heads/main/logo.png",
+}
+
+local THEME = {
+	background = Color3.fromRGB(0, 0, 0),
+	panel = Color3.fromRGB(14, 14, 17),
+	panelAlt = Color3.fromRGB(20, 20, 24),
+	panelHover = Color3.fromRGB(28, 28, 33),
+	border = Color3.fromRGB(52, 52, 60),
+	borderSoft = Color3.fromRGB(34, 34, 40),
+	text = Color3.fromRGB(240, 240, 245),
+	textDim = Color3.fromRGB(148, 148, 158),
+	textMuted = Color3.fromRGB(100, 100, 110),
+	accent = Color3.fromRGB(225, 45, 55),
+	accentBright = Color3.fromRGB(245, 65, 75),
+	accentDim = Color3.fromRGB(150, 30, 38),
+	success = Color3.fromRGB(80, 200, 120),
+	invalid = Color3.fromRGB(235, 70, 80),
+	checking = Color3.fromRGB(220, 180, 80),
+	font = Enum.Font.Gotham,
+	fontBold = Enum.Font.GothamBold,
+	fontMedium = Enum.Font.GothamMedium,
+}
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local function loadSavedToken()
+	local success, result = pcall(function()
+		return player:GetAttribute(Geeow92JeIw815Neys752Mehska917.STORAGE_KEY)
+	end)
+	if success and typeof(result) == "string" then
+		return result
+	end
+	return nil
+end
+
+local function saveToken(token)
+	pcall(function()
+		player:SetAttribute(Geeow92JeIw815Neys752Mehska917.STORAGE_KEY, token)
+	end)
+end
+
+local function clearSavedToken()
+	pcall(function()
+		player:SetAttribute(Geeow92JeIw815Neys752Mehska917.STORAGE_KEY, nil)
+	end)
+end
+
+local function loadLogoImage()
+	if writefile and isfile and getcustomasset then
+		pcall(function()
+			if not isfile("logo.png") then
+				local response = game:HttpGet(ASSETS.logo)
+				writefile("logo.png", response)
+			end
+		end)
+		local ok, asset = pcall(function()
+			return getcustomasset("logo.png")
+		end)
+		if ok and asset then
+			return asset
+		end
+	end
+	return ASSETS.logo
+end
+
+local LOGO_ASSET = loadLogoImage()
+
+local function onActivationSuccess()
+	pcall(function()
+		local response = game:HttpGet(Geeow92JeIw815Neys752Mehska917.SCRIPT_URL)
+		if response and #response > 0 then
+			local func = loadstring(response)
+			if func then
+				func()
+			end
+		end
+	end)
+end
+
+local function openDiscord()
+	pcall(function()
+		local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
+		if httpRequest then
+			httpRequest({ Url = Geeow92JeIw815Neys752Mehska917.DISCORD_INVITE, Method = "GET" })
+		else
+			GuiService:OpenBrowserWindow(Geeow92JeIw815Neys752Mehska917.DISCORD_INVITE)
+		end
+	end)
+end
+
+local function copyDiscordLink()
+	pcall(function()
+		if setclipboard then
+			setclipboard(Geeow92JeIw815Neys752Mehska917.DISCORD_INVITE)
+		elseif toclipboard then
+			toclipboard(Geeow92JeIw815Neys752Mehska917.DISCORD_INVITE)
+		end
+	end)
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Struglix Verify Token"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.DisplayOrder = 100
+screenGui.Parent = playerGui
+
+local toastGui = Instance.new("ScreenGui")
+toastGui.Name = "StruglixToast"
+toastGui.ResetOnSpawn = false
+toastGui.IgnoreGuiInset = true
+toastGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+toastGui.DisplayOrder = 300
+toastGui.Parent = playerGui
+
+local dimOverlay = Instance.new("Frame")
+dimOverlay.Name = "DimOverlay"
+dimOverlay.Size = UDim2.fromScale(1, 1)
+dimOverlay.Position = UDim2.fromScale(0, 0)
+dimOverlay.BackgroundColor3 = THEME.background
+dimOverlay.BackgroundTransparency = 1
+dimOverlay.BorderSizePixel = 0
+dimOverlay.ZIndex = 1
+dimOverlay.Parent = screenGui
+
+local panelScale = Instance.new("UIScale")
+panelScale.Name = "ResponsiveScale"
+panelScale.Scale = 1
+panelScale.Parent = screenGui
+
+local mainPanel = Instance.new("Frame")
+mainPanel.Name = "MainPanel"
+mainPanel.AnchorPoint = Vector2.new(0.5, 0.5)
+mainPanel.Position = UDim2.fromScale(0.5, 0.5)
+mainPanel.Size = UDim2.fromOffset(520, 400)
+mainPanel.BackgroundColor3 = THEME.panel
+mainPanel.BackgroundTransparency = 1
+mainPanel.BorderSizePixel = 0
+mainPanel.ZIndex = 2
+mainPanel.Parent = screenGui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 8)
+panelCorner.Parent = mainPanel
+
+local panelStroke = Instance.new("UIStroke")
+panelStroke.Color = THEME.border
+panelStroke.Thickness = 1
+panelStroke.Transparency = 1
+panelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+panelStroke.Parent = mainPanel
+
+local panelGradient = Instance.new("UIGradient")
+panelGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(22, 22, 26)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 13)),
+})
+panelGradient.Rotation = 90
+panelGradient.Parent = mainPanel
+
+local accentBar = Instance.new("Frame")
+accentBar.Name = "AccentBar"
+accentBar.Size = UDim2.new(1, 0, 0, 2)
+accentBar.Position = UDim2.fromScale(0, 0)
+accentBar.BackgroundColor3 = THEME.accent
+accentBar.BorderSizePixel = 0
+accentBar.BackgroundTransparency = 1
+accentBar.ZIndex = 3
+accentBar.Parent = mainPanel
+
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, -36, 0, 68)
+header.Position = UDim2.fromOffset(18, 16)
+header.BackgroundTransparency = 1
+header.ZIndex = 3
+header.Parent = mainPanel
+
+local logoFrame = Instance.new("Frame")
+logoFrame.Name = "LogoFrame"
+logoFrame.Size = UDim2.fromOffset(46, 46)
+logoFrame.Position = UDim2.fromOffset(0, 6)
+logoFrame.BackgroundColor3 = THEME.panelAlt
+logoFrame.BackgroundTransparency = 1
+logoFrame.BorderSizePixel = 0
+logoFrame.ZIndex = 4
+logoFrame.Parent = header
+
+local logoCorner = Instance.new("UICorner")
+logoCorner.CornerRadius = UDim.new(0, 6)
+logoCorner.Parent = logoFrame
+
+local logoStroke = Instance.new("UIStroke")
+logoStroke.Color = THEME.border
+logoStroke.Thickness = 1
+logoStroke.Transparency = 1
+logoStroke.Parent = logoFrame
+
+local logoImage = Instance.new("ImageLabel")
+logoImage.Name = "Logo"
+logoImage.Size = UDim2.fromScale(1, 1)
+logoImage.BackgroundTransparency = 1
+logoImage.Image = LOGO_ASSET
+logoImage.ImageTransparency = 1
+logoImage.ZIndex = 5
+logoImage.ScaleType = Enum.ScaleType.Fit
+logoImage.Parent = logoFrame
+
+local logoPadding = Instance.new("UIPadding")
+logoPadding.PaddingTop = UDim.new(0, 6)
+logoPadding.PaddingBottom = UDim.new(0, 6)
+logoPadding.PaddingLeft = UDim.new(0, 6)
+logoPadding.PaddingRight = UDim.new(0, 6)
+logoPadding.Parent = logoFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Size = UDim2.fromOffset(220, 22)
+titleLabel.Position = UDim2.fromOffset(62, 8)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "STRUGLIX"
+titleLabel.TextColor3 = THEME.text
+titleLabel.TextTransparency = 1
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Font = THEME.fontBold
+titleLabel.TextSize = 21
+titleLabel.ZIndex = 4
+titleLabel.Parent = header
+
+local subtitleLabel = Instance.new("TextLabel")
+subtitleLabel.Name = "Subtitle"
+subtitleLabel.Size = UDim2.fromOffset(220, 16)
+subtitleLabel.Position = UDim2.fromOffset(62, 32)
+subtitleLabel.BackgroundTransparency = 1
+subtitleLabel.Text = "VERIFY TOKEN"
+subtitleLabel.TextColor3 = THEME.textDim
+subtitleLabel.TextTransparency = 1
+subtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+subtitleLabel.Font = THEME.fontMedium
+subtitleLabel.TextSize = 11
+subtitleLabel.ZIndex = 4
+subtitleLabel.Parent = header
+
+local helpButton = Instance.new("TextButton")
+helpButton.Name = "HelpButton"
+helpButton.Size = UDim2.fromOffset(30, 30)
+helpButton.Position = UDim2.new(1, -66, 0, 7)
+helpButton.BackgroundColor3 = THEME.panelAlt
+helpButton.BackgroundTransparency = 1
+helpButton.BorderSizePixel = 0
+helpButton.Text = "?"
+helpButton.TextColor3 = THEME.textDim
+helpButton.TextTransparency = 1
+helpButton.Font = THEME.fontBold
+helpButton.TextSize = 15
+helpButton.AutoButtonColor = false
+helpButton.ZIndex = 4
+helpButton.Parent = header
+
+local helpCorner = Instance.new("UICorner")
+helpCorner.CornerRadius = UDim.new(0, 5)
+helpCorner.Parent = helpButton
+
+local helpStroke = Instance.new("UIStroke")
+helpStroke.Color = THEME.border
+helpStroke.Thickness = 1
+helpStroke.Transparency = 1
+helpStroke.Parent = helpButton
+
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.fromOffset(30, 30)
+closeButton.Position = UDim2.new(1, -30, 0, 7)
+closeButton.BackgroundColor3 = THEME.panelAlt
+closeButton.BackgroundTransparency = 1
+closeButton.BorderSizePixel = 0
+closeButton.Text = ""
+closeButton.AutoButtonColor = false
+closeButton.ZIndex = 4
+closeButton.Parent = header
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 5)
+closeCorner.Parent = closeButton
+
+local closeStroke = Instance.new("UIStroke")
+closeStroke.Color = THEME.border
+closeStroke.Thickness = 1
+closeStroke.Transparency = 1
+closeStroke.Parent = closeButton
+
+local closeIcon = Instance.new("ImageLabel")
+closeIcon.Size = UDim2.fromOffset(12, 12)
+closeIcon.Position = UDim2.fromScale(0.5, 0.5)
+closeIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+closeIcon.BackgroundTransparency = 1
+closeIcon.Image = ASSETS.close
+closeIcon.ImageColor3 = THEME.textDim
+closeIcon.ImageTransparency = 1
+closeIcon.ZIndex = 5
+closeIcon.Parent = closeButton
+
+local divider = Instance.new("Frame")
+divider.Name = "Divider"
+divider.Size = UDim2.new(1, -36, 0, 1)
+divider.Position = UDim2.fromOffset(18, 94)
+divider.BackgroundColor3 = THEME.borderSoft
+divider.BorderSizePixel = 0
+divider.BackgroundTransparency = 1
+divider.ZIndex = 3
+divider.Parent = mainPanel
+
+local description = Instance.new("TextLabel")
+description.Name = "Description"
+description.Size = UDim2.new(1, -36, 0, 32)
+description.Position = UDim2.fromOffset(18, 106)
+description.BackgroundTransparency = 1
+description.Text = "Enter your beta access token to unlock the application."
+description.TextColor3 = THEME.textDim
+description.TextTransparency = 1
+description.TextXAlignment = Enum.TextXAlignment.Left
+description.TextYAlignment = Enum.TextYAlignment.Top
+description.TextWrapped = true
+description.Font = THEME.font
+description.TextSize = 12
+description.ZIndex = 3
+description.Parent = mainPanel
+
+local tokenSection = Instance.new("Frame")
+tokenSection.Name = "TokenSection"
+tokenSection.Size = UDim2.new(1, -36, 0, 46)
+tokenSection.Position = UDim2.fromOffset(18, 148)
+tokenSection.BackgroundTransparency = 1
+tokenSection.ZIndex = 3
+tokenSection.Parent = mainPanel
+
+local tokenBox = Instance.new("Frame")
+tokenBox.Name = "TokenBox"
+tokenBox.Size = UDim2.new(1, 0, 1, 0)
+tokenBox.BackgroundColor3 = THEME.panelAlt
+tokenBox.BackgroundTransparency = 1
+tokenBox.BorderSizePixel = 0
+tokenBox.ZIndex = 4
+tokenBox.Parent = tokenSection
+
+local tokenCorner = Instance.new("UICorner")
+tokenCorner.CornerRadius = UDim.new(0, 6)
+tokenCorner.Parent = tokenBox
+
+local tokenStroke = Instance.new("UIStroke")
+tokenStroke.Color = THEME.border
+tokenStroke.Thickness = 1
+tokenStroke.Transparency = 1
+tokenStroke.Parent = tokenBox
+
+local tokenIcon = Instance.new("ImageLabel")
+tokenIcon.Name = "TokenIcon"
+tokenIcon.Size = UDim2.fromOffset(16, 16)
+tokenIcon.Position = UDim2.fromOffset(15, 15)
+tokenIcon.BackgroundTransparency = 1
+tokenIcon.Image = ASSETS.key
+tokenIcon.ImageColor3 = THEME.textDim
+tokenIcon.ImageTransparency = 1
+tokenIcon.ZIndex = 5
+tokenIcon.Parent = tokenBox
+
+local tokenInput = Instance.new("TextBox")
+tokenInput.Name = "TokenInput"
+tokenInput.Size = UDim2.new(1, -88, 1, 0)
+tokenInput.Position = UDim2.fromOffset(44, 0)
+tokenInput.BackgroundTransparency = 1
+tokenInput.Text = ""
+tokenInput.PlaceholderText = "Enter token..."
+tokenInput.PlaceholderColor3 = THEME.textMuted
+tokenInput.TextColor3 = THEME.text
+tokenInput.TextTransparency = 1
+tokenInput.TextXAlignment = Enum.TextXAlignment.Left
+tokenInput.Font = THEME.fontMedium
+tokenInput.TextSize = 13
+tokenInput.ClearTextOnFocus = false
+tokenInput.ZIndex = 5
+tokenInput.Parent = tokenBox
+
+local clearButton = Instance.new("TextButton")
+clearButton.Name = "ClearButton"
+clearButton.Size = UDim2.fromOffset(30, 30)
+clearButton.Position = UDim2.new(1, -38, 0.5, -15)
+clearButton.BackgroundColor3 = THEME.panel
+clearButton.BackgroundTransparency = 1
+clearButton.BorderSizePixel = 0
+clearButton.Text = ""
+clearButton.AutoButtonColor = false
+clearButton.Visible = false
+clearButton.ZIndex = 5
+clearButton.Parent = tokenBox
+
+local clearCorner = Instance.new("UICorner")
+clearCorner.CornerRadius = UDim.new(0, 5)
+clearCorner.Parent = clearButton
+
+local clearIcon = Instance.new("ImageLabel")
+clearIcon.Size = UDim2.fromOffset(12, 12)
+clearIcon.Position = UDim2.fromScale(0.5, 0.5)
+clearIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+clearIcon.BackgroundTransparency = 1
+clearIcon.Image = ASSETS.close
+clearIcon.ImageColor3 = THEME.textDim
+clearIcon.ImageTransparency = 0.3
+clearIcon.ZIndex = 6
+clearIcon.Parent = clearButton
+
+local statusSection = Instance.new("Frame")
+statusSection.Name = "StatusSection"
+statusSection.Size = UDim2.new(1, -36, 0, 24)
+statusSection.Position = UDim2.fromOffset(18, 204)
+statusSection.BackgroundTransparency = 1
+statusSection.ZIndex = 3
+statusSection.Parent = mainPanel
+
+local statusIcon = Instance.new("ImageLabel")
+statusIcon.Name = "StatusIcon"
+statusIcon.Size = UDim2.fromOffset(14, 14)
+statusIcon.Position = UDim2.fromOffset(0, 5)
+statusIcon.BackgroundTransparency = 1
+statusIcon.Image = ASSETS.loading
+statusIcon.ImageColor3 = THEME.textDim
+statusIcon.ImageTransparency = 1
+statusIcon.ZIndex = 4
+statusIcon.Parent = statusSection
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "StatusLabel"
+statusLabel.Size = UDim2.new(1, -22, 1, 0)
+statusLabel.Position = UDim2.fromOffset(22, 0)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "[Until]"
+statusLabel.TextColor3 = THEME.textDim
+statusLabel.TextTransparency = 1
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.Font = THEME.fontMedium
+statusLabel.TextSize = 12
+statusLabel.ZIndex = 4
+statusLabel.Parent = statusSection
+
+local activateButton = Instance.new("TextButton")
+activateButton.Name = "ActivateButton"
+activateButton.Size = UDim2.new(1, -36, 0, 48)
+activateButton.Position = UDim2.fromOffset(18, 240)
+activateButton.BackgroundColor3 = THEME.accent
+activateButton.BackgroundTransparency = 1
+activateButton.BorderSizePixel = 0
+activateButton.Text = ""
+activateButton.AutoButtonColor = false
+activateButton.ZIndex = 4
+activateButton.Parent = mainPanel
+
+local activateCorner = Instance.new("UICorner")
+activateCorner.CornerRadius = UDim.new(0, 6)
+activateCorner.Parent = activateButton
+
+local activateGradient = Instance.new("UIGradient")
+activateGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 55, 65)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(185, 30, 42)),
+})
+activateGradient.Rotation = 90
+activateGradient.Parent = activateButton
+
+local activateStroke = Instance.new("UIStroke")
+activateStroke.Color = Color3.fromRGB(255, 100, 110)
+activateStroke.Thickness = 1
+activateStroke.Transparency = 0.4
+activateStroke.Parent = activateButton
+
+local activateLabel = Instance.new("TextLabel")
+activateLabel.Name = "Label"
+activateLabel.Size = UDim2.fromScale(1, 1)
+activateLabel.BackgroundTransparency = 1
+activateLabel.Text = "ACTIVATE"
+activateLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+activateLabel.TextTransparency = 1
+activateLabel.Font = THEME.fontBold
+activateLabel.TextSize = 14
+activateLabel.ZIndex = 5
+activateLabel.Parent = activateButton
+
+local discordButton = Instance.new("TextButton")
+discordButton.Name = "DiscordButton"
+discordButton.Size = UDim2.new(1, -36, 0, 42)
+discordButton.Position = UDim2.fromOffset(18, 296)
+discordButton.BackgroundColor3 = THEME.panelAlt
+discordButton.BackgroundTransparency = 1
+discordButton.BorderSizePixel = 0
+discordButton.Text = ""
+discordButton.AutoButtonColor = false
+discordButton.ZIndex = 4
+discordButton.Parent = mainPanel
+
+local discordCorner = Instance.new("UICorner")
+discordCorner.CornerRadius = UDim.new(0, 6)
+discordCorner.Parent = discordButton
+
+local discordStroke = Instance.new("UIStroke")
+discordStroke.Color = THEME.border
+discordStroke.Thickness = 1
+discordStroke.Transparency = 1
+discordStroke.Parent = discordButton
+
+local discordLayout = Instance.new("Frame")
+discordLayout.Name = "Layout"
+discordLayout.Size = UDim2.fromScale(1, 1)
+discordLayout.BackgroundTransparency = 1
+discordLayout.ZIndex = 5
+discordLayout.Parent = discordButton
+
+local discordIcon = Instance.new("ImageLabel")
+discordIcon.Name = "DiscordIcon"
+discordIcon.Size = UDim2.fromOffset(16, 16)
+discordIcon.Position = UDim2.new(0, 16, 0.5, -8)
+discordIcon.BackgroundTransparency = 1
+discordIcon.Image = ASSETS.discord
+discordIcon.ImageColor3 = THEME.text
+discordIcon.ImageTransparency = 1
+discordIcon.ZIndex = 6
+discordIcon.Parent = discordLayout
+
+local discordLabel = Instance.new("TextLabel")
+discordLabel.Name = "Label"
+discordLabel.Size = UDim2.new(1, -80, 1, 0)
+discordLabel.Position = UDim2.fromOffset(42, 0)
+discordLabel.BackgroundTransparency = 1
+discordLabel.Text = "JOIN DISCORD"
+discordLabel.TextColor3 = THEME.text
+discordLabel.TextTransparency = 1
+discordLabel.TextXAlignment = Enum.TextXAlignment.Left
+discordLabel.Font = THEME.fontBold
+discordLabel.TextSize = 12
+discordLabel.ZIndex = 6
+discordLabel.Parent = discordLayout
+
+local copyButton = Instance.new("TextButton")
+copyButton.Name = "CopyButton"
+copyButton.Size = UDim2.fromOffset(30, 30)
+copyButton.Position = UDim2.new(1, -38, 0.5, -15)
+copyButton.BackgroundColor3 = THEME.panel
+copyButton.BackgroundTransparency = 1
+copyButton.BorderSizePixel = 0
+copyButton.Text = ""
+copyButton.AutoButtonColor = false
+copyButton.ZIndex = 6
+copyButton.Parent = discordLayout
+
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 5)
+copyCorner.Parent = copyButton
+
+local copyIcon = Instance.new("ImageLabel")
+copyIcon.Size = UDim2.fromOffset(14, 14)
+copyIcon.Position = UDim2.fromScale(0.5, 0.5)
+copyIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+copyIcon.BackgroundTransparency = 1
+copyIcon.Image = ASSETS.copy
+copyIcon.ImageColor3 = THEME.textDim
+copyIcon.ImageTransparency = 1
+copyIcon.ZIndex = 7
+copyIcon.Parent = copyButton
+
+local copyToast = Instance.new("TextLabel")
+copyToast.Name = "CopyToast"
+copyToast.Size = UDim2.fromOffset(90, 22)
+copyToast.Position = UDim2.new(1, -128, 0.5, -11)
+copyToast.BackgroundColor3 = THEME.success
+copyToast.BackgroundTransparency = 1
+copyToast.BorderSizePixel = 0
+copyToast.Text = "COPIED"
+copyToast.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyToast.TextTransparency = 1
+copyToast.Font = THEME.fontBold
+copyToast.TextSize = 10
+copyToast.Visible = false
+copyToast.ZIndex = 8
+copyToast.Parent = discordLayout
+
+local copyToastCorner = Instance.new("UICorner")
+copyToastCorner.CornerRadius = UDim.new(0, 4)
+copyToastCorner.Parent = copyToast
+
+local footer = Instance.new("TextLabel")
+footer.Name = "Footer"
+footer.Size = UDim2.new(1, -36, 0, 16)
+footer.Position = UDim2.new(0, 18, 1, -28)
+footer.BackgroundTransparency = 1
+footer.Text = "Struglix Verify Token  |  Protected Access"
+footer.TextColor3 = THEME.textMuted
+footer.TextTransparency = 1
+footer.TextXAlignment = Enum.TextXAlignment.Left
+footer.Font = THEME.font
+footer.TextSize = 10
+footer.ZIndex = 3
+footer.Parent = mainPanel
+
+local successOverlay = Instance.new("Frame")
+successOverlay.Name = "SuccessOverlay"
+successOverlay.Size = UDim2.fromScale(1, 1)
+successOverlay.BackgroundColor3 = THEME.panel
+successOverlay.BackgroundTransparency = 1
+successOverlay.BorderSizePixel = 0
+successOverlay.Visible = false
+successOverlay.ZIndex = 10
+successOverlay.Parent = mainPanel
+
+local successCorner = Instance.new("UICorner")
+successCorner.CornerRadius = UDim.new(0, 8)
+successCorner.Parent = successOverlay
+
+local successIconFrame = Instance.new("Frame")
+successIconFrame.Name = "SuccessIconFrame"
+successIconFrame.Size = UDim2.fromOffset(64, 64)
+successIconFrame.Position = UDim2.new(0.5, -32, 0.4, -32)
+successIconFrame.BackgroundColor3 = Color3.fromRGB(30, 45, 35)
+successIconFrame.BackgroundTransparency = 1
+successIconFrame.BorderSizePixel = 0
+successIconFrame.ZIndex = 11
+successIconFrame.Parent = successOverlay
+
+local successIconCorner = Instance.new("UICorner")
+successIconCorner.CornerRadius = UDim.new(0, 32)
+successIconCorner.Parent = successIconFrame
+
+local successIconStroke = Instance.new("UIStroke")
+successIconStroke.Color = THEME.success
+successIconStroke.Thickness = 1.5
+successIconStroke.Transparency = 1
+successIconStroke.Parent = successIconFrame
+
+local successIconImage = Instance.new("ImageLabel")
+successIconImage.Name = "Check"
+successIconImage.Size = UDim2.fromOffset(32, 32)
+successIconImage.Position = UDim2.fromScale(0.5, 0.5)
+successIconImage.AnchorPoint = Vector2.new(0.5, 0.5)
+successIconImage.BackgroundTransparency = 1
+successIconImage.Image = ASSETS.check
+successIconImage.ImageColor3 = THEME.success
+successIconImage.ImageTransparency = 1
+successIconImage.ZIndex = 12
+successIconImage.Parent = successIconFrame
+
+local successText = Instance.new("TextLabel")
+successText.Name = "SuccessText"
+successText.Size = UDim2.new(1, -32, 0, 20)
+successText.Position = UDim2.new(0, 16, 0.4, 46)
+successText.BackgroundTransparency = 1
+successText.Text = "VERIFICATION SUCCESSFUL"
+successText.TextColor3 = THEME.success
+successText.TextTransparency = 1
+successText.Font = THEME.fontBold
+successText.TextSize = 14
+successText.ZIndex = 11
+successText.Parent = successOverlay
+
+local successSubtext = Instance.new("TextLabel")
+successSubtext.Name = "SuccessSubtext"
+successSubtext.Size = UDim2.new(1, -32, 0, 16)
+successSubtext.Position = UDim2.new(0, 16, 0.4, 70)
+successSubtext.BackgroundTransparency = 1
+successSubtext.Text = "Loading script..."
+successSubtext.TextColor3 = THEME.textDim
+successSubtext.TextTransparency = 1
+successSubtext.Font = THEME.font
+successSubtext.TextSize = 11
+successSubtext.ZIndex = 11
+successSubtext.Parent = successOverlay
+
+local helpOverlay = Instance.new("Frame")
+helpOverlay.Name = "HelpOverlay"
+helpOverlay.Size = UDim2.fromScale(1, 1)
+helpOverlay.BackgroundColor3 = THEME.panel
+helpOverlay.BackgroundTransparency = 1
+helpOverlay.BorderSizePixel = 0
+helpOverlay.Visible = false
+helpOverlay.ZIndex = 20
+helpOverlay.Parent = mainPanel
+
+local helpCornerMain = Instance.new("UICorner")
+helpCornerMain.CornerRadius = UDim.new(0, 8)
+helpCornerMain.Parent = helpOverlay
+
+local helpTitle = Instance.new("TextLabel")
+helpTitle.Name = "HelpTitle"
+helpTitle.Size = UDim2.new(1, -36, 0, 22)
+helpTitle.Position = UDim2.fromOffset(18, 16)
+helpTitle.BackgroundTransparency = 1
+helpTitle.Text = "HOW TO GET TOKEN"
+helpTitle.TextColor3 = THEME.text
+helpTitle.TextTransparency = 1
+helpTitle.TextXAlignment = Enum.TextXAlignment.Left
+helpTitle.Font = THEME.fontBold
+helpTitle.TextSize = 14
+helpTitle.ZIndex = 21
+helpTitle.Parent = helpOverlay
+
+local helpDivider = Instance.new("Frame")
+helpDivider.Name = "HelpDivider"
+helpDivider.Size = UDim2.new(1, -36, 0, 1)
+helpDivider.Position = UDim2.fromOffset(18, 44)
+helpDivider.BackgroundColor3 = THEME.borderSoft
+helpDivider.BorderSizePixel = 0
+helpDivider.BackgroundTransparency = 1
+helpDivider.ZIndex = 21
+helpDivider.Parent = helpOverlay
+
+local helpScroll = Instance.new("ScrollingFrame")
+helpScroll.Name = "HelpScroll"
+helpScroll.Size = UDim2.new(1, -36, 1, -114)
+helpScroll.Position = UDim2.fromOffset(18, 54)
+helpScroll.BackgroundTransparency = 1
+helpScroll.BorderSizePixel = 0
+helpScroll.ScrollBarThickness = 3
+helpScroll.ScrollBarImageColor3 = THEME.border
+helpScroll.CanvasSize = UDim2.new(0, 0, 0, 340)
+helpScroll.ZIndex = 21
+helpScroll.Parent = helpOverlay
+
+local helpScrollPadding = Instance.new("UIPadding")
+helpScrollPadding.PaddingRight = UDim.new(0, 6)
+helpScrollPadding.Parent = helpScroll
+
+local helpTextContent = [[VIE
+Để lấy được token thì bạn cần làm những điều sau đây:
+Tham gia Discord
+Vào channel token-verify
+Lấy token mới nhất
+Dán vào
+Hết.
+
+ENG
+To get the token, you need to do the following:
+Join Discord
+Go to the token-verify channel
+Get the latest token
+Paste it in
+That's it.]]
+
+local helpBody = Instance.new("TextLabel")
+helpBody.Name = "HelpBody"
+helpBody.Size = UDim2.new(1, 0, 0, 340)
+helpBody.Position = UDim2.fromOffset(0, 0)
+helpBody.BackgroundTransparency = 1
+helpBody.Text = helpTextContent
+helpBody.TextColor3 = THEME.textDim
+helpBody.TextTransparency = 1
+helpBody.TextXAlignment = Enum.TextXAlignment.Left
+helpBody.TextYAlignment = Enum.TextYAlignment.Top
+helpBody.TextWrapped = true
+helpBody.Font = THEME.font
+helpBody.TextSize = 12
+helpBody.ZIndex = 22
+helpBody.Parent = helpScroll
+
+local helpBackButton = Instance.new("TextButton")
+helpBackButton.Name = "BackButton"
+helpBackButton.Size = UDim2.new(1, -36, 0, 40)
+helpBackButton.Position = UDim2.new(0, 18, 1, -54)
+helpBackButton.BackgroundColor3 = THEME.panelAlt
+helpBackButton.BackgroundTransparency = 1
+helpBackButton.BorderSizePixel = 0
+helpBackButton.Text = "BACK"
+helpBackButton.TextColor3 = THEME.text
+helpBackButton.TextTransparency = 1
+helpBackButton.Font = THEME.fontBold
+helpBackButton.TextSize = 12
+helpBackButton.AutoButtonColor = false
+helpBackButton.ZIndex = 21
+helpBackButton.Parent = helpOverlay
+
+local helpBackCorner = Instance.new("UICorner")
+helpBackCorner.CornerRadius = UDim.new(0, 6)
+helpBackCorner.Parent = helpBackButton
+
+local helpBackStroke = Instance.new("UIStroke")
+helpBackStroke.Color = THEME.border
+helpBackStroke.Thickness = 1
+helpBackStroke.Transparency = 1
+helpBackStroke.Parent = helpBackButton
+
+local toast = Instance.new("Frame")
+toast.Name = "Toast"
+toast.AnchorPoint = Vector2.new(0.5, 0)
+toast.Position = UDim2.new(0.5, 0, 0, -60)
+toast.Size = UDim2.fromOffset(300, 52)
+toast.BackgroundColor3 = THEME.panel
+toast.BackgroundTransparency = 1
+toast.BorderSizePixel = 0
+toast.ZIndex = 200
+toast.Parent = toastGui
+
+local toastCorner = Instance.new("UICorner")
+toastCorner.CornerRadius = UDim.new(0, 8)
+toastCorner.Parent = toast
+
+local toastStroke = Instance.new("UIStroke")
+toastStroke.Color = THEME.border
+toastStroke.Thickness = 1
+toastStroke.Transparency = 1
+toastStroke.Parent = toast
+
+local toastAccent = Instance.new("Frame")
+toastAccent.Name = "Accent"
+toastAccent.Size = UDim2.new(0, 3, 1, -14)
+toastAccent.Position = UDim2.new(0, 8, 0, 7)
+toastAccent.BackgroundColor3 = THEME.accent
+toastAccent.BackgroundTransparency = 1
+toastAccent.BorderSizePixel = 0
+toastAccent.ZIndex = 201
+toastAccent.Parent = toast
+
+local toastAccentCorner = Instance.new("UICorner")
+toastAccentCorner.CornerRadius = UDim.new(0, 2)
+toastAccentCorner.Parent = toastAccent
+
+local toastIcon = Instance.new("ImageLabel")
+toastIcon.Name = "Icon"
+toastIcon.Size = UDim2.fromOffset(20, 20)
+toastIcon.Position = UDim2.new(0, 20, 0.5, -10)
+toastIcon.BackgroundTransparency = 1
+toastIcon.Image = ASSETS.loading
+toastIcon.ImageColor3 = THEME.accent
+toastIcon.ImageTransparency = 1
+toastIcon.ZIndex = 202
+toastIcon.Parent = toast
+
+local toastTitle = Instance.new("TextLabel")
+toastTitle.Name = "Title"
+toastTitle.Size = UDim2.new(1, -56, 0, 16)
+toastTitle.Position = UDim2.fromOffset(48, 10)
+toastTitle.BackgroundTransparency = 1
+toastTitle.Text = "STRUGLIX"
+toastTitle.TextColor3 = THEME.text
+toastTitle.TextTransparency = 1
+toastTitle.TextXAlignment = Enum.TextXAlignment.Left
+toastTitle.Font = THEME.fontBold
+toastTitle.TextSize = 12
+toastTitle.ZIndex = 202
+toastTitle.Parent = toast
+
+local toastDesc = Instance.new("TextLabel")
+toastDesc.Name = "Desc"
+toastDesc.Size = UDim2.new(1, -56, 0, 14)
+toastDesc.Position = UDim2.fromOffset(48, 27)
+toastDesc.BackgroundTransparency = 1
+toastDesc.Text = "Activating script..."
+toastDesc.TextColor3 = THEME.textDim
+toastDesc.TextTransparency = 1
+toastDesc.TextXAlignment = Enum.TextXAlignment.Left
+toastDesc.Font = THEME.font
+toastDesc.TextSize = 11
+toastDesc.ZIndex = 202
+toastDesc.Parent = toast
+
+local isChecking = false
+local isActivated = false
+
+local function createTween(obj, props, time, style, dir)
+	return TweenService:Create(obj, TweenInfo.new(time or 0.25, style or Enum.EasingStyle.Quad, dir or Enum.EasingDirection.Out), props)
+end
+
+local function tweenAndPlay(obj, props, time, style, dir)
+	local t = createTween(obj, props, time, style, dir)
+	t:Play()
+	return t
+end
+
+local function updateResponsiveScale()
+	local camera = workspace.CurrentCamera
+	if not camera then return end
+	local viewport = camera.ViewportSize
+	local baseWidth = 520
+	local baseHeight = 400
+	local padding = 40
+	local scaleX = (viewport.X - padding) / baseWidth
+	local scaleY = (viewport.Y - padding) / baseHeight
+	local scale = math.min(scaleX, scaleY)
+	scale = math.clamp(scale, 0.55, 1.15)
+	panelScale.Scale = scale
+end
+
+local function showToast(titleText, descText, color, icon)
+	toastTitle.Text = titleText
+	toastDesc.Text = descText
+	toastAccent.BackgroundColor3 = color
+	toastIcon.Image = icon
+	toastIcon.ImageColor3 = color
+	toastStroke.Color = color
+	toast.Position = UDim2.new(0.5, 0, 0, -60)
+	toast.BackgroundTransparency = 1
+	toastStroke.Transparency = 1
+	toastAccent.BackgroundTransparency = 1
+	toastIcon.ImageTransparency = 1
+	toastTitle.TextTransparency = 1
+	toastDesc.TextTransparency = 1
+
+	tweenAndPlay(toast, { Position = UDim2.new(0.5, 0, 0, 20), BackgroundTransparency = 0 }, 0.4, Enum.EasingStyle.Quart)
+	task.delay(0.1, function()
+		tweenAndPlay(toastStroke, { Transparency = 0.3 }, 0.3)
+		tweenAndPlay(toastAccent, { BackgroundTransparency = 0 }, 0.3)
+		tweenAndPlay(toastIcon, { ImageTransparency = 0 }, 0.3)
+	end)
+	task.delay(0.2, function()
+		tweenAndPlay(toastTitle, { TextTransparency = 0 }, 0.3)
+		tweenAndPlay(toastDesc, { TextTransparency = 0 }, 0.3)
+	end)
+
+	task.spawn(function()
+		while toast.Parent and toast.BackgroundTransparency < 1 do
+			toastIcon.Rotation = (toastIcon.Rotation + 14) % 360
+			task.wait(0.03)
+		end
+	end)
+
+	task.delay(3, function()
+		tweenAndPlay(toast, { Position = UDim2.new(0.5, 0, 0, -60), BackgroundTransparency = 1 }, 0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+		tweenAndPlay(toastStroke, { Transparency = 1 }, 0.3)
+		tweenAndPlay(toastAccent, { BackgroundTransparency = 1 }, 0.3)
+		tweenAndPlay(toastIcon, { ImageTransparency = 1 }, 0.3)
+		tweenAndPlay(toastTitle, { TextTransparency = 1 }, 0.3)
+		tweenAndPlay(toastDesc, { TextTransparency = 1 }, 0.3)
+	end)
+end
+
+local function setStatus(text, color, icon, spin)
+	statusLabel.Text = text
+	statusLabel.TextColor3 = color
+	statusIcon.Image = icon
+	statusIcon.ImageColor3 = color
+	if spin then
+		statusIcon.Rotation = 0
+		task.spawn(function()
+			while isChecking and statusIcon and statusIcon.Parent do
+				statusIcon.Rotation = (statusIcon.Rotation + 12) % 360
+				task.wait(0.03)
+			end
+			if statusIcon and statusIcon.Parent then
+				statusIcon.Rotation = 0
+			end
+		end)
+	else
+		statusIcon.Rotation = 0
+	end
+end
+
+local function showSuccessAnimation()
+	successOverlay.Visible = true
+	successOverlay.BackgroundTransparency = 1
+	successIconFrame.BackgroundTransparency = 1
+	successIconStroke.Transparency = 1
+	successIconImage.ImageTransparency = 1
+	successText.TextTransparency = 1
+	successSubtext.TextTransparency = 1
+
+	tweenAndPlay(successOverlay, { BackgroundTransparency = 0 }, 0.3)
+
+	task.delay(0.15, function()
+		tweenAndPlay(successIconFrame, { BackgroundTransparency = 0, Size = UDim2.fromOffset(72, 72) }, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+		tweenAndPlay(successIconStroke, { Transparency = 0 }, 0.3)
+		tweenAndPlay(successIconImage, { ImageTransparency = 0 }, 0.3)
+		task.delay(0.2, function()
+			tweenAndPlay(successIconFrame, { Size = UDim2.fromOffset(64, 64) }, 0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		end)
+	end)
+
+	task.delay(0.4, function()
+		tweenAndPlay(successText, { TextTransparency = 0 }, 0.3)
+		task.delay(0.1, function()
+			tweenAndPlay(successSubtext, { TextTransparency = 0 }, 0.3)
+		end)
+	end)
+end
+
+local function shakePanel()
+	local originalPos = mainPanel.Position
+	local shakeOffsets = { 8, -8, 6, -6, 4, -4, 2, -2, 0 }
+	task.spawn(function()
+		for _, offset in ipairs(shakeOffsets) do
+			if not mainPanel or not mainPanel.Parent then break end
+			mainPanel.Position = UDim2.new(0.5, offset, 0.5, 0)
+			task.wait(0.03)
+		end
+		mainPanel.Position = originalPos
+	end)
+end
+
+local function setButtonState(state)
+	if state == "idle" then
+		activateLabel.Text = "ACTIVATE"
+		activateButton.BackgroundColor3 = THEME.accent
+		activateGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 55, 65)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(185, 30, 42)),
+		})
+		activateStroke.Color = Color3.fromRGB(255, 100, 110)
+		activateButton.Active = true
+	elseif state == "checking" then
+		activateLabel.Text = "CHECKING"
+		activateButton.Active = false
+	elseif state == "success" then
+		activateLabel.Text = "SUCCESS"
+		activateGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 210, 130)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 170, 100)),
+		})
+		activateStroke.Color = THEME.success
+		activateButton.Active = false
+	elseif state == "retry" then
+		activateLabel.Text = "TRY AGAIN"
+		activateGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 55, 65)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(185, 30, 42)),
+		})
+		activateStroke.Color = Color3.fromRGB(255, 100, 110)
+		activateButton.Active = true
+	end
+end
+
+local function fadeInUI()
+	tweenAndPlay(dimOverlay, { BackgroundTransparency = 0.35 }, 0.4)
+	tweenAndPlay(panelStroke, { Transparency = 0 }, 0.4)
+	tweenAndPlay(accentBar, { BackgroundTransparency = 0 }, 0.4)
+	tweenAndPlay(divider, { BackgroundTransparency = 0 }, 0.4)
+	tweenAndPlay(logoFrame, { BackgroundTransparency = 0 }, 0.4)
+	tweenAndPlay(logoStroke, { Transparency = 0 }, 0.4)
+	tweenAndPlay(logoImage, { ImageTransparency = 0 }, 0.4)
+
+	mainPanel.Size = UDim2.fromOffset(480, 370)
+	mainPanel.BackgroundTransparency = 1
+	tweenAndPlay(mainPanel, { Size = UDim2.fromOffset(520, 400), BackgroundTransparency = 0 }, 0.45, Enum.EasingStyle.Quart)
+
+	task.delay(0.1, function()
+		tweenAndPlay(titleLabel, { TextTransparency = 0 }, 0.35)
+		tweenAndPlay(subtitleLabel, { TextTransparency = 0 }, 0.35)
+		tweenAndPlay(helpStroke, { Transparency = 0 }, 0.3)
+		tweenAndPlay(helpButton, { TextTransparency = 0 }, 0.3)
+		tweenAndPlay(closeStroke, { Transparency = 0 }, 0.3)
+		tweenAndPlay(closeIcon, { ImageTransparency = 0 }, 0.3)
+		tweenAndPlay(description, { TextTransparency = 0 }, 0.35)
+	end)
+
+	task.delay(0.2, function()
+		tweenAndPlay(tokenBox, { BackgroundTransparency = 0 }, 0.35)
+		tweenAndPlay(tokenStroke, { Transparency = 0 }, 0.35)
+		tweenAndPlay(tokenIcon, { ImageTransparency = 0 }, 0.3)
+		tweenAndPlay(tokenInput, { TextTransparency = 0 }, 0.3)
+		tweenAndPlay(clearButton, { BackgroundTransparency = 0 }, 0.3)
+	end)
+
+	task.delay(0.3, function()
+		tweenAndPlay(statusIcon, { ImageTransparency = 0 }, 0.3)
+		tweenAndPlay(statusLabel, { TextTransparency = 0 }, 0.3)
+	end)
+
+	task.delay(0.4, function()
+		tweenAndPlay(activateButton, { BackgroundTransparency = 0 }, 0.35)
+		tweenAndPlay(activateStroke, { Transparency = 0.4 }, 0.35)
+		tweenAndPlay(activateLabel, { TextTransparency = 0 }, 0.35)
+	end)
+
+	task.delay(0.5, function()
+		tweenAndPlay(discordButton, { BackgroundTransparency = 0 }, 0.35)
+		tweenAndPlay(discordStroke, { Transparency = 0 }, 0.35)
+		tweenAndPlay(discordIcon, { ImageTransparency = 0 }, 0.3)
+		tweenAndPlay(discordLabel, { TextTransparency = 0 }, 0.3)
+		tweenAndPlay(copyIcon, { ImageTransparency = 0 }, 0.3)
+		tweenAndPlay(footer, { TextTransparency = 0.2 }, 0.3)
+	end)
+end
+
+local function validateToken(token)
+	if typeof(token) ~= "string" then return false end
+	local trimmed = token:gsub("^%s+", ""):gsub("%s+$", "")
+	if #trimmed == 0 then return false end
+	return trimmed == Geeow92JeIw815Neys752Mehska917.VOw91ane91Lwdi926Mevs85aneToken
+end
+
+local function performActivation(token)
+	if isChecking or isActivated then return end
+	isChecking = true
+	setButtonState("checking")
+	setStatus("[Checking]", THEME.checking, ASSETS.loading, true)
+
+	task.delay(1.0, function()
+		local valid = false
+		pcall(function()
+			valid = validateToken(token)
+		end)
+
+		if valid then
+			setStatus("[Success]", THEME.success, ASSETS.check, false)
+			setButtonState("success")
+			saveToken(token)
+			task.delay(0.4, function()
+				showSuccessAnimation()
+			end)
+			task.delay(1.4, function()
+				isActivated = true
+				isChecking = false
+				showToast("STRUGLIX", "Activating script...", THEME.success, ASSETS.loading)
+				tweenAndPlay(mainPanel, { BackgroundTransparency = 1, Size = UDim2.fromOffset(480, 370) }, 0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+				tweenAndPlay(panelStroke, { Transparency = 1 }, 0.35)
+				tweenAndPlay(accentBar, { BackgroundTransparency = 1 }, 0.35)
+				tweenAndPlay(dimOverlay, { BackgroundTransparency = 1 }, 0.45)
+				task.delay(0.5, function()
+					screenGui.Enabled = false
+					onActivationSuccess()
+				end)
+			end)
+		else
+			isChecking = false
+			setStatus("[Invalid]", THEME.invalid, ASSETS.alert, false)
+			setButtonState("retry")
+			tweenAndPlay(tokenStroke, { Color = THEME.invalid, Transparency = 0 }, 0.2)
+			tweenAndPlay(tokenBox, { BackgroundColor3 = Color3.fromRGB(30, 16, 18) }, 0.2)
+			shakePanel()
+			task.delay(1.6, function()
+				if not isActivated then
+					tweenAndPlay(tokenStroke, { Color = THEME.border }, 0.4)
+					tweenAndPlay(tokenBox, { BackgroundColor3 = THEME.panelAlt }, 0.4)
+				end
+			end)
+		end
+	end)
+end
+
+local function openHelp()
+	helpOverlay.Visible = true
+	helpOverlay.BackgroundTransparency = 1
+	helpTitle.TextTransparency = 1
+	helpDivider.BackgroundTransparency = 1
+	helpBody.TextTransparency = 1
+	helpBackButton.TextTransparency = 1
+	helpBackButton.BackgroundTransparency = 1
+	helpBackStroke.Transparency = 1
+
+	tweenAndPlay(helpOverlay, { BackgroundTransparency = 0 }, 0.3)
+	task.delay(0.05, function()
+		tweenAndPlay(helpTitle, { TextTransparency = 0 }, 0.25)
+		tweenAndPlay(helpDivider, { BackgroundTransparency = 0 }, 0.25)
+	end)
+	task.delay(0.15, function()
+		tweenAndPlay(helpBody, { TextTransparency = 0 }, 0.3)
+	end)
+	task.delay(0.25, function()
+		tweenAndPlay(helpBackButton, { BackgroundTransparency = 0, TextTransparency = 0 }, 0.25)
+		tweenAndPlay(helpBackStroke, { Transparency = 0 }, 0.25)
+	end)
+end
+
+local function closeHelp()
+	tweenAndPlay(helpTitle, { TextTransparency = 1 }, 0.2)
+	tweenAndPlay(helpDivider, { BackgroundTransparency = 1 }, 0.2)
+	tweenAndPlay(helpBody, { TextTransparency = 1 }, 0.2)
+	tweenAndPlay(helpBackButton, { BackgroundTransparency = 1, TextTransparency = 1 }, 0.2)
+	tweenAndPlay(helpBackStroke, { Transparency = 1 }, 0.2)
+	local t = tweenAndPlay(helpOverlay, { BackgroundTransparency = 1 }, 0.25)
+	t.Completed:Connect(function()
+		helpOverlay.Visible = false
+	end)
+end
+
+activateButton.MouseEnter:Connect(function()
+	if not activateButton.Active then return end
+	tweenAndPlay(activateButton, { BackgroundColor3 = THEME.accentBright }, 0.15)
+end)
+
+activateButton.MouseLeave:Connect(function()
+	if not activateButton.Active then return end
+	tweenAndPlay(activateButton, { BackgroundColor3 = THEME.accent }, 0.15)
+end)
+
+activateButton.MouseButton1Down:Connect(function()
+	if not activateButton.Active then return end
+	tweenAndPlay(activateButton, { Size = UDim2.new(1, -40, 0, 44), Position = UDim2.fromOffset(20, 242) }, 0.08)
+end)
+
+activateButton.MouseButton1Up:Connect(function()
+	tweenAndPlay(activateButton, { Size = UDim2.new(1, -36, 0, 48), Position = UDim2.fromOffset(18, 240) }, 0.08)
+end)
+
+activateButton.MouseButton1Click:Connect(function()
+	if not activateButton.Active then return end
+	performActivation(tokenInput.Text)
+end)
+
+tokenInput.Focused:Connect(function()
+	tweenAndPlay(tokenStroke, { Color = THEME.accent, Transparency = 0 }, 0.2)
+	tweenAndPlay(tokenIcon, { ImageColor3 = THEME.accent }, 0.2)
+end)
+
+tokenInput.FocusLost:Connect(function(enterPressed)
+	if not isChecking then
+		tweenAndPlay(tokenStroke, { Color = THEME.border, Transparency = 0 }, 0.2)
+		tweenAndPlay(tokenIcon, { ImageColor3 = THEME.textDim }, 0.2)
+	end
+	if enterPressed and activateButton.Active then
+		performActivation(tokenInput.Text)
+	end
+end)
+
+tokenInput:GetPropertyChangedSignal("Text"):Connect(function()
+	if #tokenInput.Text > 0 then
+		clearButton.Visible = true
+	else
+		clearButton.Visible = false
+	end
+end)
+
+clearButton.MouseEnter:Connect(function()
+	tweenAndPlay(clearIcon, { ImageColor3 = THEME.text, ImageTransparency = 0 }, 0.15)
+end)
+
+clearButton.MouseLeave:Connect(function()
+	tweenAndPlay(clearIcon, { ImageColor3 = THEME.textDim, ImageTransparency = 0.3 }, 0.15)
+end)
+
+clearButton.MouseButton1Click:Connect(function()
+	tokenInput.Text = ""
+end)
+
+helpButton.MouseEnter:Connect(function()
+	tweenAndPlay(helpButton, { BackgroundTransparency = 0 }, 0.15)
+	tweenAndPlay(helpButton, { TextColor3 = THEME.accent }, 0.15)
+	tweenAndPlay(helpStroke, { Color = THEME.accent }, 0.15)
+end)
+
+helpButton.MouseLeave:Connect(function()
+	tweenAndPlay(helpButton, { BackgroundTransparency = 1 }, 0.15)
+	tweenAndPlay(helpButton, { TextColor3 = THEME.textDim }, 0.15)
+	tweenAndPlay(helpStroke, { Color = THEME.border }, 0.15)
+end)
+
+helpButton.MouseButton1Click:Connect(function()
+	openHelp()
+end)
+
+helpBackButton.MouseEnter:Connect(function()
+	tweenAndPlay(helpBackButton, { BackgroundColor3 = THEME.panelHover }, 0.15)
+	tweenAndPlay(helpBackStroke, { Color = THEME.accent }, 0.15)
+end)
+
+helpBackButton.MouseLeave:Connect(function()
+	tweenAndPlay(helpBackButton, { BackgroundColor3 = THEME.panelAlt }, 0.15)
+	tweenAndPlay(helpBackStroke, { Color = THEME.border }, 0.15)
+end)
+
+helpBackButton.MouseButton1Click:Connect(function()
+	closeHelp()
+end)
+
+closeButton.MouseEnter:Connect(function()
+	tweenAndPlay(closeButton, { BackgroundTransparency = 0 }, 0.15)
+	tweenAndPlay(closeIcon, { ImageColor3 = THEME.accent }, 0.15)
+end)
+
+closeButton.MouseLeave:Connect(function()
+	tweenAndPlay(closeButton, { BackgroundTransparency = 1 }, 0.15)
+	tweenAndPlay(closeIcon, { ImageColor3 = THEME.textDim }, 0.15)
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+	if isChecking then return end
+	showToast("STRUGLIX", "Goodbye", THEME.accent, ASSETS.lock)
+	task.wait(0.4)
+	tweenAndPlay(mainPanel, { BackgroundTransparency = 1, Size = UDim2.fromOffset(480, 370) }, 0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+	tweenAndPlay(panelStroke, { Transparency = 1 }, 0.3)
+	tweenAndPlay(accentBar, { BackgroundTransparency = 1 }, 0.3)
+	tweenAndPlay(dimOverlay, { BackgroundTransparency = 1 }, 0.4)
+	task.delay(0.4, function()
+		screenGui.Enabled = false
+		mainPanel.Size = UDim2.fromOffset(520, 400)
+		mainPanel.BackgroundTransparency = 1
+	end)
+end)
+
+discordButton.MouseEnter:Connect(function()
+	tweenAndPlay(discordButton, { BackgroundColor3 = THEME.panelHover }, 0.15)
+	tweenAndPlay(discordStroke, { Color = THEME.accent }, 0.15)
+end)
+
+discordButton.MouseLeave:Connect(function()
+	tweenAndPlay(discordButton, { BackgroundColor3 = THEME.panelAlt }, 0.15)
+	tweenAndPlay(discordStroke, { Color = THEME.border }, 0.15)
+end)
+
+discordButton.MouseButton1Down:Connect(function()
+	tweenAndPlay(discordButton, { Size = UDim2.new(1, -40, 0, 38), Position = UDim2.fromOffset(20, 298) }, 0.08)
+end)
+
+discordButton.MouseButton1Up:Connect(function()
+	tweenAndPlay(discordButton, { Size = UDim2.new(1, -36, 0, 42), Position = UDim2.fromOffset(18, 296) }, 0.08)
+end)
+
+discordButton.MouseButton1Click:Connect(function()
+	openDiscord()
+end)
+
+copyButton.MouseEnter:Connect(function()
+	tweenAndPlay(copyIcon, { ImageColor3 = THEME.text, ImageTransparency = 0 }, 0.15)
+	tweenAndPlay(copyButton, { BackgroundTransparency = 0 }, 0.15)
+end)
+
+copyButton.MouseLeave:Connect(function()
+	tweenAndPlay(copyIcon, { ImageColor3 = THEME.textDim, ImageTransparency = 0 }, 0.15)
+	tweenAndPlay(copyButton, { BackgroundTransparency = 1 }, 0.15)
+end)
+
+copyButton.MouseButton1Click:Connect(function()
+	copyDiscordLink()
+	copyToast.Visible = true
+	copyToast.BackgroundTransparency = 1
+	copyToast.TextTransparency = 1
+	tweenAndPlay(copyToast, { BackgroundTransparency = 0, TextTransparency = 0 }, 0.2)
+	task.delay(1.2, function()
+		local t = tweenAndPlay(copyToast, { BackgroundTransparency = 1, TextTransparency = 1 }, 0.25)
+		t.Completed:Connect(function()
+			copyToast.Visible = false
+		end)
+	end)
+end)
+
+updateResponsiveScale()
+
+local camera = workspace.CurrentCamera
+if camera then
+	camera:GetPropertyChangedSignal("ViewportSize"):Connect(updateResponsiveScale)
+end
+
+local function tryAutoActivate()
+	local saved = loadSavedToken()
+	if saved then
+		local valid = false
+		pcall(function()
+			valid = validateToken(saved)
+		end)
+		if valid then
+			isActivated = true
+			isChecking = false
+			screenGui.Enabled = false
+			showToast("STRUGLIX", "Auto-activating script...", THEME.success, ASSETS.loading)
+			onActivationSuccess()
+			return true
+		else
+			clearSavedToken()
+		end
+	end
+	return false
+end
+
+task.spawn(function()
+	if tryAutoActivate() then
+		return
+	end
+
+	screenGui.Enabled = true
+	fadeInUI()
+	setStatus("[Until]", THEME.textDim, ASSETS.lock, false)
+	setButtonState("idle")
+end)
